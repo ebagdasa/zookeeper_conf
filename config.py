@@ -7,6 +7,10 @@ nodes = [
     {"node": "compute30", "login": "ebagdasa", "pass": "eb693eb693"},
     {"node": "compute29", "login": "ebagdasa", "pass": "eb693eb693"},
     {"node": "compute28", "login": "ebagdasa", "pass": "eb693eb693"},
+    {"node": "compute27", "login": "ebagdasa", "pass": "eb693eb693"},
+    {"node": "compute26", "login": "ebagdasa", "pass": "eb693eb693"},
+    {"node": "compute25", "login": "ebagdasa", "pass": "eb693eb693"},
+    {"node": "compute24", "login": "ebagdasa", "pass": "eb693eb693"},
 ]
 port_1='2889'
 port_2='3889'
@@ -30,7 +34,7 @@ def modify_zookeper(servers):
                     for i, x in enumerate(servers)]
     modified_config = config.format(data_dir=data_dir, servers_list='\n'.join(servers_list))
     # stop service
-    execute_zookeper(servers, 'stop')
+    # execute_zookeper(servers, 'stop')
 
     for i, server in enumerate(servers):
         host_string = '{0}.{1}'.format(server['node'], full_hostname)
@@ -51,10 +55,13 @@ def execute_zookeper(servers, command):
                 run('{file} {command}'.format(file=zookeeper_location+'/bin/zkServer.sh', command=command))
                 run('jps')
 
-def main(amount):
-    servers = nodes[:5]
+
+def main():
+    amount = 7
+    execute_zookeper(nodes, 'stop')
+    servers = nodes[:amount]
     modify_zookeper(servers)
     return 0
 
 if __name__ == "__main__":
-    main(5)
+    main()
