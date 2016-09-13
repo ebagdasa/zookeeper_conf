@@ -11,6 +11,10 @@ nodes = [
     {"node": "compute26", "login": "ebagdasa", "pass": "eb693eb693"},
     {"node": "compute25", "login": "ebagdasa", "pass": "eb693eb693"},
     {"node": "compute24", "login": "ebagdasa", "pass": "eb693eb693"},
+    {"node": "compute20", "login": "ebagdasa", "pass": "sst"},
+    {"node": "compute18", "login": "ebagdasa", "pass": "sst"},
+    {"node": "compute17", "login": "ebagdasa", "pass": "sst"},
+    {"node": "compute16", "login": "ebagdasa", "pass": "sst"},
 ]
 port_1='2889'
 port_2='3889'
@@ -52,15 +56,32 @@ def execute_zookeper(servers, command):
         host_string = '{0}.{1}'.format(server['node'], full_hostname)
         with settings(host_string=host_string, user=server['login'], password=server['pass']):
             with path("/opt/jdk1.7.0_67/bin"):
+                # sudo('chown ebagdasa:sudo -R {0}'.format(zookeeper_location))
                 run('{file} {command}'.format(file=zookeeper_location+'/bin/zkServer.sh', command=command))
                 run('jps')
 
 
+def cmd(servers, command):
+    response = []
+    for server in servers:
+        host_string = '{0}.{1}'.format(server['node'], full_hostname)
+        with settings(host_string=host_string, user=server['login'], password=server['pass']):
+            with path("/opt/jdk1.7.0_67/bin"):
+                response.append({'server': server['node'], 'result': run(command)})
+    return response
+
+
 def main():
-    amount = 7
+    amount = 3
+    cmd1 = 'echo stat | nc localhost 2182 | grep Mode'
+
     execute_zookeper(nodes, 'stop')
     servers = nodes[:amount]
     modify_zookeper(servers)
+    results = cmd(servers, cmd1)
+    for dic in results:
+        if 'leader' in dic['result']:
+            print dic['server']
     return 0
 
 if __name__ == "__main__":
